@@ -60,7 +60,6 @@ const MobileNav = () => {
                                     )
                                 })}
                     </ul>
-
                         </>
                         
                     </SheetContent>
