@@ -31,6 +31,7 @@ import { AspectRatioKey, debounce, deepMergeObjects } from "@/lib/utils"
 import { useRouter } from "next/router"
 import { updateCredits } from "@/lib/actions/user.actions"
 import MediaUploader from "./MediaUploader"
+import TransformedImage from "../shared/TransformedImage"
   
 
 
