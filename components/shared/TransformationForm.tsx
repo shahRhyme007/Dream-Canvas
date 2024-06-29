@@ -32,6 +32,7 @@ import { useRouter } from "next/router"
 import { updateCredits } from "@/lib/actions/user.actions"
 import MediaUploader from "./MediaUploader"
 import TransformedImage from "../shared/TransformedImage"
+import { getCldImageUrl } from "next-cloudinary"
   
 
 
@@ -130,9 +131,6 @@ const TransformationForm = ({action, data = null, userId, type, creditBalance, c
   })
  
   // 2. Define a submit handler.
-  function onSubmit(values: z.infer<typeof formSchema>) {
-    console.log(values)
-  }
 
 
   return (
