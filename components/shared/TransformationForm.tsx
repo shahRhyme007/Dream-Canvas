@@ -30,6 +30,7 @@ import { useEffect, useState, useTransition } from "react"
 import { AspectRatioKey, debounce, deepMergeObjects } from "@/lib/utils"
 import { useRouter } from "next/router"
 import { updateCredits } from "@/lib/actions/user.actions"
+import MediaUploader from "./MediaUploader"
   
 
 
@@ -194,7 +195,7 @@ const TransformationForm = ({action, data = null, userId, type, creditBalance, c
                   )}
                 />
               )}
-            />
+            />       
 
             {type === 'recolor' && (
               <CustomField 
@@ -219,6 +220,36 @@ const TransformationForm = ({action, data = null, userId, type, creditBalance, c
           </div>
         )}
 
+
+        {/* CLOUDINARY */}
+        <div className="media-uploader-field">
+          <CustomField 
+            control={form.control}
+            name="publicId"
+            className="flex size-full flex-col"
+            render={({ field }) => (
+              <MediaUploader 
+                onValueChange={field.onChange}
+                setImage={setImage}
+                publicId={field.value}
+                image={image}
+                type={type}
+              />
+            )}
+          />
+
+          <TransformedImage 
+            image={image}
+            type={type}
+            title={form.getValues().title}
+            isTransforming={isTransforming}
+            setIsTransforming={setIsTransforming}
+            transformationConfig={transformationConfig}
+          />
+        </div>
+
+
+        {/* SUBMIT BUTTON */}
 
         <div className="flex flex-col gap-4">
 
