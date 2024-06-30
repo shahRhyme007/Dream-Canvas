@@ -96,6 +96,8 @@ export async function getImageById(imageId: string) {
     }
   }
   
+
+//   TODO: FROM HERE(FIX THE CODE)------------------------------>
   // GET IMAGES
   export async function getAllImages({ limit = 9, page = 1, searchQuery = '' }: {
     limit?: number;
