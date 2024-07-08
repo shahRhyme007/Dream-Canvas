@@ -1,5 +1,4 @@
 "use client";
-
 import Image from "next/image";
 import Link from "next/link";
 import { useSearchParams, useRouter } from "next/navigation";
@@ -56,7 +55,8 @@ export const Collection = ({
       {images.length > 0 ? (
         <ul className="collection-list">
           {images.map((image) => (
-            <Card image={image} key={image._id} />
+            // TODO: NEED TO FIX THE key (maybe a problem with the query params)
+            <Card image={image} key={image.author._id} />
           ))}
         </ul>
       ) : (
