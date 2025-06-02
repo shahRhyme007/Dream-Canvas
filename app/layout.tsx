@@ -10,8 +10,8 @@ const IBMPlex = IBM_Plex_Sans({ subsets: ["latin"]
  });
 
 export const metadata: Metadata = {
-  title: "AI Image Editor",
-  description: "AI powered image editor",
+  title: "DreamCanvas",
+  description: "Transform your creative vision with AI-powered image editing",
 };
 
 export default function RootLayout({

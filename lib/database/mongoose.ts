@@ -23,7 +23,7 @@ export const connectToDatabase = async () => {
   cached.promise = 
     cached.promise || 
     mongoose.connect(MONGODB_URL, { 
-      dbName: 'ai-image-editor', bufferCommands: false 
+      dbName: 'dreamcanvas', bufferCommands: false 
     })
 
   cached.conn = await cached.promise;

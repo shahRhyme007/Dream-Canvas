@@ -155,22 +155,54 @@ export async function getUserImages({
   limit = 9,
   page = 1,
   userId,
+  searchQuery = '',
 }: {
   limit?: number;
   page: number;
   userId: string;
+  searchQuery?: string;
 }) {
   try {
     await connectToDatabase();
 
+    cloudinary.config({
+      cloud_name: process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME,
+      api_key: process.env.CLOUDINARY_API_KEY,
+      api_secret: process.env.CLOUDINARY_API_SECRET,
+      secure: true,
+    })
+
+    let expression = 'folder=rhyme_ai_editor';
+
+    if (searchQuery) {
+      expression += ` AND ${searchQuery}`
+    }
+
+    const { resources } = await cloudinary.search
+      .expression(expression)
+      .execute();
+
+    const resourceIds = resources.map((resource: any) => resource.public_id);
+
+    let query: any = { author: userId };
+
+    if(searchQuery) {
+      query = {
+        author: userId,
+        publicId: {
+          $in: resourceIds
+        }
+      }
+    }
+
     const skipAmount = (Number(page) - 1) * limit;
 
-    const images = await populateUser(Image.find({ author: userId }))
+    const images = await populateUser(Image.find(query))
       .sort({ updatedAt: -1 })
       .skip(skipAmount)
       .limit(limit);
 
-    const totalImages = await Image.find({ author: userId }).countDocuments();
+    const totalImages = await Image.find(query).countDocuments();
 
     return {
       data: JSON.parse(JSON.stringify(images)),

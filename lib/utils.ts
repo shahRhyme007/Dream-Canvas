@@ -12,9 +12,18 @@ export function cn(...inputs: ClassValue[]) {
 
 // ERROR HANDLER
 export const handleError = (error: unknown) => {
+  console.error("Full error object:", error);
+  
   if (error instanceof Error) {
     // This is a native JavaScript error (e.g., TypeError, RangeError)
-    console.error(error.message);
+    console.error("Error message:", error.message);
+    console.error("Error stack:", error.stack);
+    
+    // Provide specific guidance for common errors
+    if (error.message.includes('ENOTFOUND') || error.message.includes('querySrv')) {
+      console.error("🔴 MongoDB Connection Error - Check your MONGODB_URL environment variable and internet connection");
+    }
+    
     throw new Error(`Error: ${error.message}`);
   } else if (typeof error === "string") {
     // This is a string error message
