@@ -3,6 +3,7 @@
 import { z } from "zod"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
+import { motion } from "framer-motion"
  
 import { Button } from "@/components/ui/button"
 import {
@@ -58,6 +59,26 @@ const TransformationForm = ({action, data = null, userId, type, creditBalance, c
     const [isPending, startTransition] = useTransition()
     const router = useRouter()
 
+    const containerVariants = {
+        hidden: { opacity: 0, y: 20 },
+        visible: {
+            opacity: 1,
+            y: 0,
+            transition: {
+                duration: 0.6,
+                staggerChildren: 0.1
+            }
+        }
+    }
+
+    const itemVariants = {
+        hidden: { opacity: 0, y: 20 },
+        visible: {
+            opacity: 1,
+            y: 0,
+            transition: { duration: 0.4 }
+        }
+    }
 
     const initialValues = data && action === "Update" ? {
         title: data?.title,
@@ -209,48 +230,60 @@ const TransformationForm = ({action, data = null, userId, type, creditBalance, c
 
 
   return (
-    <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-       {creditBalance <Math.abs(creditFee) && <InsufficientCreditsModal/>}
+    <motion.div
+        variants={containerVariants}
+        initial="hidden"
+        animate="visible"
+        className="bg-white/80 backdrop-blur-sm rounded-2xl p-6 shadow-lg border border-purple-100"
+    >
+      <Form {...form}>
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+         {creditBalance <Math.abs(creditFee) && <InsufficientCreditsModal/>}
 
-      <CustomField
-            control={form.control}
-            name="title"
-            formLabel="Image Title"
-            className="w-full"
-            render={({ field }) => <Input {...field} className="input-field" />}
-        />
-
-    {type === 'fill' && (
-            <CustomField
+        <motion.div variants={itemVariants}>
+          <CustomField
                 control={form.control}
-                name="aspectRatio"
-                formLabel="Aspect Ratio"
+                name="title"
+                formLabel="Image Title"
                 className="w-full"
-                render={({ field }) => (
-                <Select
-                    onValueChange={(value) => onSelectFieldHandler(value, field.onChange)}
-                    value={field.value}
-                >
-                    <SelectTrigger className="select-field">
-                    <SelectValue placeholder="Select size" />
-                    </SelectTrigger>
-                    <SelectContent>
-                    {Object.keys(aspectRatioOptions).map((key) => (
-                        <SelectItem key={key} value={key} className="select-item">
-                        {aspectRatioOptions[key as AspectRatioKey].label}
-                        </SelectItem>
-                    ))}
-                    </SelectContent>
-                </Select>
-                )}  
+                render={({ field }) => <Input {...field} className="input-field" />}
             />
+        </motion.div>
 
-    )}
+        {type === 'fill' && (
+            <motion.div variants={itemVariants}>
+              <CustomField
+                  control={form.control}
+                  name="aspectRatio"
+                  formLabel="Aspect Ratio"
+                  className="w-full"
+                  render={({ field }) => (
+                  <Select
+                      onValueChange={(value) => onSelectFieldHandler(value, field.onChange)}
+                      value={field.value}
+                  >
+                      <SelectTrigger className="select-field">
+                      <SelectValue placeholder="Select size" />
+                      </SelectTrigger>
+                      <SelectContent>
+                      {Object.keys(aspectRatioOptions).map((key) => (
+                          <SelectItem key={key} value={key} className="select-item">
+                          {aspectRatioOptions[key as AspectRatioKey].label}
+                          </SelectItem>
+                      ))}
+                      </SelectContent>
+                  </Select>
+                  )}  
+              />
+            </motion.div>
+        )}
 
 
-    {(type === 'remove' || type === 'recolor') && (
-          <div className="prompt-field">
+        {(type === 'remove' || type === 'recolor') && (
+          <motion.div 
+            className="prompt-field"
+            variants={itemVariants}
+          >
             <CustomField 
               control={form.control}
               name="prompt"
@@ -292,12 +325,15 @@ const TransformationForm = ({action, data = null, userId, type, creditBalance, c
                 )}
               />
             )}
-          </div>
+          </motion.div>
         )}
 
 
         {/* CLOUDINARY */}
-        <div className="media-uploader-field">
+        <motion.div 
+          className="media-uploader-field"
+          variants={itemVariants}
+        >
           <CustomField 
             control={form.control}
             name="publicId"
@@ -321,31 +357,43 @@ const TransformationForm = ({action, data = null, userId, type, creditBalance, c
             setIsTransforming={setIsTransforming}
             transformationConfig={transformationConfig}
           />
-        </div>
+        </motion.div>
 
 
         {/* SUBMIT BUTTON */}
-
-        <div className="flex flex-col gap-4">
-
-        <Button type="button"
-        className="submit-button capitalize"
-        disabled = {isTransforming || newTransformation === null}
-        onClick={onTransformHandler}
+        <motion.div 
+          className="flex flex-col gap-4"
+          variants={itemVariants}
         >
-            {isTransforming ? 'Transforming...' : 'Apply transformation'}
-        </Button>
 
-<Button type="submit"
-        className="submit-button capitalize"
-        disabled = {isSubmitting}
-        >{isSubmitting ? 'Submitting...' : 'Save Image'}</Button>
-        </div>
+          <motion.div
+            whileHover={{ scale: 1.02, y: -2 }}
+            whileTap={{ scale: 0.98 }}
+            transition={{ type: "spring", stiffness: 300 }}
+          >
+            <Button type="button"
+              className="submit-button capitalize"
+              disabled = {isTransforming || newTransformation === null}
+              onClick={onTransformHandler}
+            >
+                {isTransforming ? 'Transforming...' : 'Apply transformation'}
+            </Button>
+          </motion.div>
 
-
-    
+          <motion.div
+            whileHover={{ scale: 1.02, y: -2 }}
+            whileTap={{ scale: 0.98 }}
+            transition={{ type: "spring", stiffness: 300 }}
+          >
+            <Button type="submit"
+              className="submit-button capitalize"
+              disabled = {isSubmitting}
+            >{isSubmitting ? 'Submitting...' : 'Save Image'}</Button>
+          </motion.div>
+        </motion.div>
       </form>
     </Form>
+    </motion.div>
   )
 }
 

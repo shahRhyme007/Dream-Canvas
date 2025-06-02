@@ -1,12 +1,12 @@
 import { SignedIn } from "@clerk/nextjs";
-import { auth } from "@clerk/nextjs/server";
+import { auth, currentUser } from "@clerk/nextjs/server";
 import Image from "next/image";
 import { redirect } from "next/navigation";
 
 import Header from "@/components/shared/Header";
 import { Button } from "@/components/ui/button";
 import { plans } from "@/constants";
-import { getUserById } from "@/lib/actions/user.actions";
+import { getUserById, createUser } from "@/lib/actions/user.actions";
 import Checkout from "@/components/shared/Checkout";
 
 const Credits = async () => {
@@ -14,7 +14,31 @@ const Credits = async () => {
 
   if (!userId) redirect("/sign-in");
 
-  const user = await getUserById(userId);
+  // Try to get the user from database, create if doesn't exist
+  let user;
+  try {
+    user = await getUserById(userId);
+  } catch (error) {
+    // If user doesn't exist, create them
+    console.log("User not found in database, creating new user...");
+    const clerkUser = await currentUser();
+    
+    if (clerkUser) {
+      const userData = {
+        clerkId: clerkUser.id,
+        email: clerkUser.emailAddresses[0].emailAddress,
+        username: clerkUser.username || clerkUser.firstName || "user",
+        firstName: clerkUser.firstName || '',
+        lastName: clerkUser.lastName || '',
+        photo: clerkUser.imageUrl,
+      };
+      
+      user = await createUser(userData);
+      console.log("New user created:", user._id);
+    } else {
+      redirect("/sign-in");
+    }
+  }
 
   return (
     <>
