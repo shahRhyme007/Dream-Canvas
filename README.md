@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="public/assets/images/logo-text.svg" alt="DreamCanvas Logo" width="400"/>
+  <img src="public/assets/images/logo-text.png" alt="DreamCanvas Logo" width="400"/>
   
   <h3>🎨 Transform Your Creative Vision with AI-Powered Image Editing</h3>
   
@@ -7,7 +7,7 @@
     <strong>DreamCanvas</strong> is a cutting-edge AI-powered image editing platform that brings professional-grade transformations to your fingertips. Built with Next.js 14 and powered by Cloudinary AI.
   </p>
 
-  <img src="public/landingPage.png" alt="DreamCanvas Logo" width="400"/>
+  <img src="public/landingPage.png" alt="DreamCanvas Logo" width="800"/>
   <p>
     <a href="#features"><strong>Features</strong></a> •
     <a href="#demo"><strong>Demo</strong></a> •
