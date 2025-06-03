@@ -66,7 +66,7 @@
 ## Demo
 
 ### Live Application
-**[Visit DreamCanvas](http://localhost:3000)** *(Replace with your deployed URL)*
+**[Visit DreamCanvas](https://dream-canvas-ai.vercel.app/)
 
 ### Key Workflows
 
