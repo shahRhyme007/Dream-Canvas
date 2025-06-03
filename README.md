@@ -66,7 +66,7 @@
 ## Demo
 
 ### Live Application
-**[Visit DreamCanvas](https://dream-canvas-ai.vercel.app/)
+**[Visit DreamCanvas](https://dream-canvas-ai.vercel.app/)**
 
 ### Key Workflows
 
