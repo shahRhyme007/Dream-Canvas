@@ -107,6 +107,11 @@
   animation: shimmer 2s infinite;
 }
 
+/* 3D Perspective for book effect */
+.perspective-1000 {
+  perspective: 1000px;
+}
+
 .auth {
   @apply flex-center min-h-screen w-full;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);

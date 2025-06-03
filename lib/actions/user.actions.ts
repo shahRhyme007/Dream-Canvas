@@ -21,6 +21,46 @@ export async function createUser(user: CreateUserParams) {
   }
 }
 
+// CREATE OR GET USER (SAFE)
+export async function createOrGetUser(user: CreateUserParams) {
+  try {
+    await connectToDatabase();
+
+    // Try to find existing user first
+    const existingUser = await User.findOne({ clerkId: user.clerkId });
+    
+    if (existingUser) {
+      return JSON.parse(JSON.stringify(existingUser));
+    }
+
+    // If user doesn't exist, create new one
+    const newUser = await User.create(user);
+    return JSON.parse(JSON.stringify(newUser));
+  } catch (error: any) {
+    // If it's a duplicate key error, try to find the existing user
+    if (error.code === 11000) {
+      const existingUser = await User.findOne({ clerkId: user.clerkId });
+      if (existingUser) {
+        return JSON.parse(JSON.stringify(existingUser));
+      }
+    }
+    handleError(error);
+  }
+}
+
+// FIND USER BY CLERK ID (NO ERROR THROWING)
+export async function findUserByClerkId(clerkId: string) {
+  try {
+    await connectToDatabase();
+
+    const user = await User.findOne({ clerkId });
+    return user ? JSON.parse(JSON.stringify(user)) : null;
+  } catch (error) {
+    console.error("Error finding user:", error);
+    return null;
+  }
+}
+
 // READ
 export async function getUserById(userId: string) {
   try {

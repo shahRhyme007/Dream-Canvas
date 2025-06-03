@@ -6,7 +6,7 @@ import { redirect } from "next/navigation";
 import Header from "@/components/shared/Header";
 import { Button } from "@/components/ui/button";
 import { plans } from "@/constants";
-import { getUserById, createUser } from "@/lib/actions/user.actions";
+import { findUserByClerkId, createOrGetUser } from "@/lib/actions/user.actions";
 import Checkout from "@/components/shared/Checkout";
 
 const Credits = async () => {
@@ -15,10 +15,9 @@ const Credits = async () => {
   if (!userId) redirect("/sign-in");
 
   // Try to get the user from database, create if doesn't exist
-  let user;
-  try {
-    user = await getUserById(userId);
-  } catch (error) {
+  let user = await findUserByClerkId(userId);
+  
+  if (!user) {
     // If user doesn't exist, create them
     console.log("User not found in database, creating new user...");
     const clerkUser = await currentUser();
@@ -33,8 +32,8 @@ const Credits = async () => {
         photo: clerkUser.imageUrl,
       };
       
-      user = await createUser(userData);
-      console.log("New user created:", user._id);
+      user = await createOrGetUser(userData);
+      console.log("User created/retrieved:", user._id);
     } else {
       redirect("/sign-in");
     }

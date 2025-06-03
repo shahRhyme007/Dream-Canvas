@@ -3,7 +3,7 @@ import React from 'react'
 import {transformationTypes} from '@/constants'
 import TransformationForm from '@/components/shared/TransformationForm'
 import { auth, currentUser } from '@clerk/nextjs/server'
-import { getUserById, createUser } from '@/lib/actions/user.actions'
+import { findUserByClerkId, createOrGetUser } from '@/lib/actions/user.actions'
 import { redirect } from 'next/navigation'
 
 const AddTrransformationTypePage = async({params : {type}} : SearchParamProps) => {
@@ -13,10 +13,9 @@ const AddTrransformationTypePage = async({params : {type}} : SearchParamProps) =
   if (!userId) redirect('/sign-in')
 
   // Try to get the user from database, create if doesn't exist
-  let user;
-  try {
-    user = await getUserById(userId);
-  } catch (error) {
+  let user = await findUserByClerkId(userId);
+  
+  if (!user) {
     // If user doesn't exist, create them
     console.log("User not found in database, creating new user...");
     const clerkUser = await currentUser();
@@ -31,8 +30,8 @@ const AddTrransformationTypePage = async({params : {type}} : SearchParamProps) =
         photo: clerkUser.imageUrl,
       };
       
-      user = await createUser(userData);
-      console.log("New user created:", user._id);
+      user = await createOrGetUser(userData);
+      console.log("User created/retrieved:", user._id);
     } else {
       redirect("/sign-in");
     }

@@ -5,7 +5,7 @@ import { redirect } from "next/navigation";
 import { Collection } from "@/components/shared/Collection";
 import Header from "@/components/shared/Header";
 import { getUserImages } from "@/lib/actions/image.actions";
-import { getUserById, createUser } from "@/lib/actions/user.actions";
+import { findUserByClerkId, createOrGetUser } from "@/lib/actions/user.actions";
 
 const Profile = async ({ searchParams }: SearchParamProps) => {
   const page = Number(searchParams?.page) || 1;
@@ -14,10 +14,9 @@ const Profile = async ({ searchParams }: SearchParamProps) => {
   if (!userId) redirect("/sign-in");
 
   // Try to get the user from database, create if doesn't exist
-  let user;
-  try {
-    user = await getUserById(userId);
-  } catch (error) {
+  let user = await findUserByClerkId(userId);
+  
+  if (!user) {
     // If user doesn't exist, create them
     console.log("User not found in database, creating new user...");
     const clerkUser = await currentUser();
@@ -32,8 +31,8 @@ const Profile = async ({ searchParams }: SearchParamProps) => {
         photo: clerkUser.imageUrl,
       };
       
-      user = await createUser(userData);
-      console.log("New user created:", user._id);
+      user = await createOrGetUser(userData);
+      console.log("User created/retrieved:", user._id);
     } else {
       redirect("/sign-in");
     }

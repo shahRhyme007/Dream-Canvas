@@ -20,21 +20,29 @@ export async function addImage({ image, userId, path }: AddImageParams) {
   try {
     await connectToDatabase();
 
+    console.log("addImage called with userId:", userId);
+
     const author = await User.findById(userId);
 
     if (!author) {
+      console.log("User not found for userId:", userId);
       throw new Error("User not found");
     }
+
+    console.log("Found author:", { _id: author._id, clerkId: author.clerkId, email: author.email });
 
     const newImage = await Image.create({
       ...image,
       author: author._id,
     })
 
+    console.log("Created image:", { _id: newImage._id, author: newImage.author, title: newImage.title });
+
     revalidatePath(path);
 
     return JSON.parse(JSON.stringify(newImage));
   } catch (error) {
+    console.error("Error in addImage:", error);
     handleError(error)
   }
 }
@@ -165,28 +173,30 @@ export async function getUserImages({
   try {
     await connectToDatabase();
 
-    cloudinary.config({
-      cloud_name: process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME,
-      api_key: process.env.CLOUDINARY_API_KEY,
-      api_secret: process.env.CLOUDINARY_API_SECRET,
-      secure: true,
-    })
+    console.log("getUserImages called with:", { userId, page, limit, searchQuery });
 
-    let expression = 'folder=rhyme_ai_editor';
-
-    if (searchQuery) {
-      expression += ` AND ${searchQuery}`
-    }
-
-    const { resources } = await cloudinary.search
-      .expression(expression)
-      .execute();
-
-    const resourceIds = resources.map((resource: any) => resource.public_id);
-
+    // Temporarily disable Cloudinary filtering to check if images exist in DB
     let query: any = { author: userId };
 
+    // Only apply Cloudinary search if there's a specific search query
     if(searchQuery) {
+      cloudinary.config({
+        cloud_name: process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME,
+        api_key: process.env.CLOUDINARY_API_KEY,
+        api_secret: process.env.CLOUDINARY_API_SECRET,
+        secure: true,
+      })
+
+      let expression = 'folder=rhyme_ai_editor';
+      expression += ` AND ${searchQuery}`;
+
+      const { resources } = await cloudinary.search
+        .expression(expression)
+        .execute();
+
+      const resourceIds = resources.map((resource: any) => resource.public_id);
+      console.log("Cloudinary resourceIds found:", resourceIds.length);
+
       query = {
         author: userId,
         publicId: {
@@ -194,6 +204,8 @@ export async function getUserImages({
         }
       }
     }
+
+    console.log("Database query:", JSON.stringify(query));
 
     const skipAmount = (Number(page) - 1) * limit;
 
@@ -204,11 +216,23 @@ export async function getUserImages({
 
     const totalImages = await Image.find(query).countDocuments();
 
+    console.log("Images found:", images.length, "Total images:", totalImages);
+
+    // Let's also check what images exist for any user
+    const allImages = await Image.find({}).limit(5);
+    console.log("Sample of all images in DB:", allImages.map(img => ({ 
+      _id: img._id, 
+      author: img.author, 
+      title: img.title,
+      publicId: img.publicId 
+    })));
+
     return {
       data: JSON.parse(JSON.stringify(images)),
       totalPages: Math.ceil(totalImages / limit),
     };
   } catch (error) {
+    console.error("Error in getUserImages:", error);
     handleError(error);
   }
 }

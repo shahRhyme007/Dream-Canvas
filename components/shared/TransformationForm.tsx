@@ -155,6 +155,11 @@ const TransformationForm = ({action, data = null, userId, type, creditBalance, c
  
   // 2. Define a submit handler.
   async function onSubmit(values: z.infer<typeof formSchema>) {
+    console.log("TransformationForm onSubmit called with:", values);
+    console.log("Current image state:", image);
+    console.log("Current transformationConfig:", transformationConfig);
+    console.log("Action:", action, "UserId:", userId);
+    
     setIsSubmitting(true);
 
     if(data || image) {
@@ -179,13 +184,18 @@ const TransformationForm = ({action, data = null, userId, type, creditBalance, c
         color: values.color,
       }
 
+      console.log("Image data to be saved:", imageData);
+
       if(action === 'Add') {
         try {
+          console.log("Calling addImage with:", { imageData, userId, path: '/' });
           const newImage = await addImage({
             image: imageData,
             userId,
             path: '/'
           })
+
+          console.log("addImage returned:", newImage);
 
           if(newImage) {
             form.reset()
@@ -193,7 +203,7 @@ const TransformationForm = ({action, data = null, userId, type, creditBalance, c
             router.push(`/transformations/${newImage._id}`)
           }
         } catch (error) {
-          console.log(error);
+          console.error("Error in addImage:", error);
         }
       }
 
@@ -215,6 +225,8 @@ const TransformationForm = ({action, data = null, userId, type, creditBalance, c
           console.log(error);
         }
       }
+    } else {
+      console.log("No data or image to submit");
     }
 
     setIsSubmitting(false)
